@@ -60,6 +60,7 @@ export default class Text extends React.Component {
 							{this.state.errors.map( (error, i) => <div key={i}>{error}</div>)}
 						</div>
 					) : null}
+					fullWidth={true}
 				/>
 			</div>
 		);
