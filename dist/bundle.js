@@ -34977,6 +34977,8 @@ var FORM_RESET = exports.FORM_RESET = 'FORM_RESET';
 },{}],398:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -34995,6 +34997,12 @@ var _MuiThemeProvider2 = _interopRequireDefault(_MuiThemeProvider);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var styles = {
 	headline: {
 		fontSize: 32,
@@ -35002,73 +35010,93 @@ var styles = {
 		fontFamily: 'Roboto, sans-serif'
 	}
 };
-_reactDom2.default.render(_react2.default.createElement(
-	_MuiThemeProvider2.default,
-	null,
-	_react2.default.createElement(
-		'div',
-		{ className: 'col-sm-8 col-sm-offset-2' },
-		_react2.default.createElement(
-			'h1',
-			{ style: styles.headline },
-			'IG Login'
-		),
-		_react2.default.createElement(
-			_app2.default,
-			{ onSubmit: function onSubmit(data) {
-					return console.log(data);
-				} },
-			_react2.default.createElement(
-				'div',
-				{ className: 'row' },
+
+var App = function (_React$Component) {
+	_inherits(App, _React$Component);
+
+	function App(props) {
+		_classCallCheck(this, App);
+
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+	}
+
+	_createClass(App, [{
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				_MuiThemeProvider2.default,
+				null,
 				_react2.default.createElement(
 					'div',
-					{ className: 'col-xs-12 col-sm-6' },
-					_react2.default.createElement(_app.Text, {
-						name: 'apiKey',
-						placeholder: 'Type your API key',
-						label: 'API Key',
-						validate: ['required']
-					})
+					{ className: 'col-sm-8 col-sm-offset-2' },
+					_react2.default.createElement(
+						'h1',
+						{ style: styles.headline },
+						'IG Login'
+					),
+					_react2.default.createElement(
+						_app2.default,
+						{ onSubmit: function onSubmit(data) {
+								return console.log(data);
+							} },
+						_react2.default.createElement(
+							'div',
+							{ className: 'row' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'col-xs-12 col-sm-6' },
+								_react2.default.createElement(_app.Text, {
+									name: 'apiKey',
+									placeholder: 'Type your API key',
+									label: 'API Key',
+									validate: ['required']
+								})
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'row' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'col-xs-12 col-sm-6' },
+								_react2.default.createElement(_app.Text, {
+									name: 'email',
+									placeholder: 'Type your email',
+									label: 'Email',
+									validate: ['required', 'email']
+								})
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'col-xs-12 col-sm-6' },
+								_react2.default.createElement(_app.Text, {
+									name: 'password',
+									placeholder: 'Type your Password',
+									label: 'Password',
+									validate: ['required'],
+									type: 'password'
+								})
+							)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'row' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'col-xs-3' },
+								_react2.default.createElement(_app.SubmitButton, { label: 'Login' })
+							)
+						)
+					)
 				)
-			),
-			_react2.default.createElement(
-				'div',
-				{ className: 'row' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'col-xs-12 col-sm-6' },
-					_react2.default.createElement(_app.Text, {
-						name: 'email',
-						placeholder: 'Type your email',
-						label: 'Email',
-						validate: ['required', 'email']
-					})
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'col-xs-12 col-sm-6' },
-					_react2.default.createElement(_app.Text, {
-						name: 'password',
-						placeholder: 'Type your Password',
-						label: 'Password',
-						validate: ['required'],
-						type: 'password'
-					})
-				)
-			),
-			_react2.default.createElement(
-				'div',
-				{ className: 'row' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'col-xs-3' },
-					_react2.default.createElement(_app.SubmitButton, null)
-				)
-			)
-		)
-	)
-), document.getElementById('content'));
+			);
+		}
+	}]);
+
+	return App;
+}(_react2.default.Component);
+
+_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('content'));
 
 },{"./app":393,"material-ui/styles/MuiThemeProvider":195,"react":376,"react-dom":217}],399:[function(require,module,exports){
 'use strict';
