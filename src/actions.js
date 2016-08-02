@@ -12,3 +12,9 @@ export function reset() {
 		type: _.FORM_RESET
 	});
 }
+
+export function loggedin() {
+	return dispatch => dispatch({
+		type: _.LOGGED_IN
+	});
+}

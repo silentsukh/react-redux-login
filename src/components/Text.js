@@ -50,11 +50,13 @@ export default class Text extends React.Component {
 		return (
 			<div>
 				<TextField
+					ref={this.props.reference}
 					hintText={this.props.placeholder}
 					floatingLabelText={this.props.label}
 					value={this.context.values[this.props.name] || ''}
 					onChange={this._onChange}
 					onBlur={this._onBlur}
+					type={this.props.type}
 					errorText={this.state.errors.length ? (
 						<div>
 							{this.state.errors.map( (error, i) => <div key={i}>{error}</div>)}
@@ -71,6 +73,8 @@ Text.propTypes = {
 	name: PropTypes.string.isRequired,
 	placeholder: PropTypes.string,
 	label: PropTypes.string,
+	type: PropTypes.string,
+	reference: PropTypes.string,
 	validate: PropTypes.arrayOf(PropTypes.string)
 };
 

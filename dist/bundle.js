@@ -34497,6 +34497,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.update = update;
 exports.reset = reset;
+exports.loggedin = loggedin;
 
 var _constants = require('./constants');
 
@@ -34517,6 +34518,14 @@ function reset() {
 	return function (dispatch) {
 		return dispatch({
 			type: _.FORM_RESET
+		});
+	};
+}
+
+function loggedin() {
+	return function (dispatch) {
+		return dispatch({
+			type: _.LOGGED_IN
 		});
 	};
 }
@@ -34599,7 +34608,7 @@ exports.default = function (props) {
 	);
 };
 
-},{"./actions":392,"./components/Form":394,"./components/SubmitButton":395,"./components/Text":396,"./store":399,"react":376,"react-redux":221,"react-tap-event-plugin":231,"redux":386,"redux-logger":379,"redux-thunk":380}],394:[function(require,module,exports){
+},{"./actions":392,"./components/Form":394,"./components/SubmitButton":395,"./components/Text":396,"./store":400,"react":376,"react-redux":221,"react-tap-event-plugin":231,"redux":386,"redux-logger":379,"redux-thunk":380}],394:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34920,11 +34929,13 @@ var Text = function (_React$Component) {
 				'div',
 				null,
 				_react2.default.createElement(_TextField2.default, {
+					ref: this.props.reference,
 					hintText: this.props.placeholder,
 					floatingLabelText: this.props.label,
 					value: this.context.values[this.props.name] || '',
 					onChange: this._onChange,
 					onBlur: this._onBlur,
+					type: this.props.type,
 					errorText: this.state.errors.length ? _react2.default.createElement(
 						'div',
 						null,
@@ -34952,6 +34963,8 @@ Text.propTypes = {
 	name: _react.PropTypes.string.isRequired,
 	placeholder: _react.PropTypes.string,
 	label: _react.PropTypes.string,
+	type: _react.PropTypes.string,
+	reference: _react.PropTypes.string,
 	validate: _react.PropTypes.arrayOf(_react.PropTypes.string)
 };
 
@@ -34965,7 +34978,7 @@ Text.defaultProps = {
 	validate: []
 };
 
-},{"../validators":400,"material-ui/TextField":188,"react":376}],397:[function(require,module,exports){
+},{"../validators":401,"material-ui/TextField":188,"react":376}],397:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34973,6 +34986,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var FORM_UPDATE_VALUE = exports.FORM_UPDATE_VALUE = 'FORM_UPDATE_VALUE';
 var FORM_RESET = exports.FORM_RESET = 'FORM_RESET';
+var LOGGED_IN = exports.LOGGED_IN = 'LOGGED_IN';
 
 },{}],398:[function(require,module,exports){
 'use strict';
@@ -34995,6 +35009,10 @@ var _MuiThemeProvider = require('material-ui/styles/MuiThemeProvider');
 
 var _MuiThemeProvider2 = _interopRequireDefault(_MuiThemeProvider);
 
+var _ig = require('../src/lib/ig');
+
+var _ig2 = _interopRequireDefault(_ig);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -35003,24 +35021,32 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var styles = {
-	headline: {
-		fontSize: 32,
-		fontWeight: 400,
-		fontFamily: 'Roboto, sans-serif'
-	}
-};
-
 var App = function (_React$Component) {
 	_inherits(App, _React$Component);
 
 	function App(props) {
 		_classCallCheck(this, App);
 
-		return _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+
+		_this.formSubmit = function (e) {
+			return _this._formSubmit(e);
+		};
+
+		_this.IG = new _ig2.default();
+		return _this;
 	}
 
 	_createClass(App, [{
+		key: '_formSubmit',
+		value: function _formSubmit(e) {
+			if (this.IG.login(e.apiKey, e.username, e.password)) {
+				console.log("Logged in!");
+				this.IG.connectToLightstreamer();
+				this.IG.subscribeToLightstreamerTradeUpdates();
+			}
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
@@ -35031,14 +35057,12 @@ var App = function (_React$Component) {
 					{ className: 'col-sm-8 col-sm-offset-2' },
 					_react2.default.createElement(
 						'h1',
-						{ style: styles.headline },
+						null,
 						'IG Login'
 					),
 					_react2.default.createElement(
 						_app2.default,
-						{ onSubmit: function onSubmit(data) {
-								return console.log(data);
-							} },
+						{ onSubmit: this.formSubmit },
 						_react2.default.createElement(
 							'div',
 							{ className: 'row' },
@@ -35060,21 +35084,22 @@ var App = function (_React$Component) {
 								'div',
 								{ className: 'col-xs-12 col-sm-6' },
 								_react2.default.createElement(_app.Text, {
-									name: 'email',
-									placeholder: 'Type your email',
-									label: 'Email',
-									validate: ['required', 'email']
+									name: 'username',
+									placeholder: 'Type your username',
+									label: 'Username',
+									validate: ['required']
 								})
 							),
 							_react2.default.createElement(
 								'div',
 								{ className: 'col-xs-12 col-sm-6' },
 								_react2.default.createElement(_app.Text, {
+									reference: 'password',
 									name: 'password',
+									type: 'password',
 									placeholder: 'Type your Password',
 									label: 'Password',
-									validate: ['required'],
-									type: 'password'
+									validate: ['required']
 								})
 							)
 						),
@@ -35098,7 +35123,420 @@ var App = function (_React$Component) {
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('content'));
 
-},{"./app":393,"material-ui/styles/MuiThemeProvider":195,"react":376,"react-dom":217}],399:[function(require,module,exports){
+},{"../src/lib/ig":399,"./app":393,"material-ui/styles/MuiThemeProvider":195,"react":376,"react-dom":217}],399:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+   value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var IG = function () {
+   function IG() {
+      _classCallCheck(this, IG);
+
+      // Default API gateway
+      this.urlRoot = "https://demo-api.ig.com/gateway/deal";
+
+      // Variables
+      this.apiKey = "";
+      this.accountId = null;
+      this.account_token = null;
+      this.client_token = null;
+      this.lsEndpoint = null;
+      this.lsClient;
+      this.ticketSubscription;
+      this.accountSubscription;
+   }
+
+   _createClass(IG, [{
+      key: "login",
+      value: function login(apiKey, username, unsafePassword) {
+         var _this = this;
+
+         // Get username and password from user interface fields
+         this.apiKey = apiKey;
+         var identifier = username;
+         var password = unsafePassword;
+
+         if (this.apiKey == "" || identifier == "" || password == "") {
+            return false;
+         }
+
+         password = this.encryptedPassword(password);
+         console.log("Encrypted password " + password);
+
+         // Create a login request, ie a POST request to /session
+         var req = new Request();
+         req.method = "POST";
+         req.url = this.urlRoot + "/session";
+
+         // Set up standard request headers, i.e. the api key, the request content type (JSON), 
+         // and the expected response content type (JSON)
+         req.headers = {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "X-IG-API-KEY": this.apiKey,
+            "Version": "2"
+         };
+
+         // Set up the request body with the user identifier (username) and password
+         var bodyParams = {};
+         bodyParams["identifier"] = identifier;
+         bodyParams["password"] = password;
+         bodyParams["encryptedPassword"] = true;
+         req.body = JSON.stringify(bodyParams);
+
+         // Send the request via a Javascript AJAX call
+         try {
+            $.ajax({
+               type: req.method,
+               url: req.url,
+               data: req.body,
+               headers: req.headers,
+               async: false,
+               mimeType: req.binary ? 'text/plain; charset=x-user-defined' : null,
+               success: function success(response, status, data) {
+
+                  // Successful login 
+                  // Extract account and client session tokens, active account id, and the Lightstreamer endpoint,
+                  // as these will be required for subsequent requests
+                  _this.account_token = data.getResponseHeader("X-SECURITY-TOKEN");
+                  console.log("X-SECURITY-TOKEN: " + _this.account_token);
+                  _this.client_token = data.getResponseHeader("CST");
+                  console.log("CST: " + _this.client_token);
+                  _this.accountId = response.currentAccountId;
+                  _this.lsEndpoint = response.lightstreamerEndpoint;
+                  // Show logged in status message on screen
+               },
+               error: function error(response, status, _error) {
+
+                  // Login failed, usually because the login id and password aren't correct
+                  console.log(response);
+               }
+            });
+         } catch (e) {
+            console.log(e);
+         }
+
+         return true;
+      }
+
+      /**
+       * Encryption function
+       */
+
+   }, {
+      key: "encryptedPassword",
+      value: function encryptedPassword(password) {
+
+         var key = this.encryptionKey();
+         var asn = void 0,
+             tree = void 0,
+             rsa = new pidCrypt.RSA(),
+             decodedKey = pidCryptUtil.decodeBase64(key.encryptionKey);
+
+         asn = pidCrypt.ASN1.decode(pidCryptUtil.toByteArray(decodedKey));
+         tree = asn.toHexTree();
+
+         rsa.setPublicKeyFromASN(tree);
+
+         return pidCryptUtil.encodeBase64(pidCryptUtil.convertFromHex(rsa.encrypt(password += '|' + key.timeStamp)));
+      }
+
+      /**
+       * Encryption key getter function
+       */
+
+   }, {
+      key: "encryptionKey",
+      value: function encryptionKey() {
+
+         // Set up the request as a GET request to the address /session/encryptionkey
+         var req = new Request();
+         req.method = "GET";
+         req.url = this.urlRoot + "/session/encryptionKey";
+
+         // Set up the request headers, i.e. the api key, the account security session token, the client security token,
+         // the request content type (JSON), and the expected response content type (JSON)
+         req.headers = {
+            "X-IG-API-KEY": this.apiKey,
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8"
+         };
+
+         // No body is required, as this is a GET request
+         req.body = "";
+
+         // Send the request via a Javascript AJAX call
+         var key;
+         try {
+            $.ajax({
+               type: req.method,
+               url: req.url,
+               data: req.body,
+               headers: req.headers,
+               async: false,
+               mimeType: req.binary ? 'text/plain; charset=x-user-defined' : null,
+               error: function error(response, status, _error2) {
+                  console.log(response);
+               },
+               success: function success(response, status, data) {
+
+                  console.log("Encryption key retrieved ");
+                  key = response;
+               }
+            });
+         } catch (e) {
+
+            // Failed to get the encryption key
+            console.log(e);
+         }
+
+         return key;
+      }
+
+      /*
+       * Function to connect to Lightstreamer
+       */
+
+   }, {
+      key: "connectToLightstreamer",
+      value: function connectToLightstreamer() {
+         var _this2 = this;
+
+         require(['LightstreamerClient', 'Subscription'], function (LightstreamerClient, Subscription) {
+
+            // Instantiate Lightstreamer client instance
+            console.log("Connecting to Lighstreamer: " + _this2.lsEndpoint);
+            _this2.lsClient = new LightstreamerClient(_this2.lsEndpoint);
+
+            // Set up login credentials: client
+            _this2.lsClient.connectionDetails.setUser(_this2.accountId);
+
+            var password = "";
+            if (_this2.client_token) {
+               password = "CST-" + _this2.client_token;
+            }
+            if (_this2.client_token && _this2.account_token) {
+               password = password + "|";
+            }
+            if (_this2.account_token) {
+               password = password + "XST-" + _this2.account_token;
+            }
+            console.log(" LSS login " + _this2.accountId + " - " + password);
+            _this2.lsClient.connectionDetails.setPassword(password);
+
+            // Add connection event listener callback functions
+            _this2.lsClient.addListener({
+               onListenStart: function onListenStart() {
+                  console.log('Lightstreamer client - start listening');
+               },
+               onStatusChange: function onStatusChange(status) {
+                  console.log('Lightstreamer connection status:' + status);
+               }
+            });
+
+            // Allowed bandwidth in kilobits/s
+            //lsClient.connectionOptions.setMaxBandwidth();
+
+            // Connect to Lightstreamer
+            _this2.lsClient.connect();
+         });
+      }
+   }, {
+      key: "subscribeToLightstreamerTradeUpdates",
+      value: function subscribeToLightstreamerTradeUpdates() {
+         var _this3 = this;
+
+         require(['LightstreamerClient', 'Subscription'], function (LightstreamerClient, Subscription) {
+            // Create a Lightstreamer subscription for the BID and OFFER prices for the relevant market
+
+            // Set up the Lightstreamer FIDs
+            _this3.accountSubscription = new Subscription("DISTINCT", "TRADE:" + _this3.accountId, ["CONFIRMS", "OPU", "WOU"]);
+
+            _this3.accountSubscription.setRequestedMaxFrequency("unfiltered");
+
+            // Set up the Lightstreamer event listeners
+            _this3.accountSubscription.addListener({
+               onSubscription: function onSubscription() {
+                  console.log('trade updates subscription succeeded');
+               },
+               onSubscriptionError: function onSubscriptionError(code, message) {
+                  console.log('trade updates subscription failure: ' + code + " message: " + message);
+               },
+               onItemUpdate: function onItemUpdate(updateInfo) {
+
+                  console.log("received trade update message: " + updateInfo.getItemName());
+
+                  updateInfo.forEachField(function (fieldName, fieldPos, value) {
+                     if (value != 'INV') {
+                        console.log("field: " + fieldName + " - value: " + value);
+                        if (fieldName == "CONFIRMS") {
+                           //showDealConfirmDialog(value);
+                        } else {
+                              //showAccountStatusUpdate(value);
+                           }
+                     }
+                  });
+               },
+               onItemLostUpdates: function onItemLostUpdates() {
+                  console.log("trade updates subscription - item lost");
+               }
+
+            });
+
+            // Subscribe to Lightstreamer
+            _this3.lsClient.subscribe(_this3.accountSubscription);
+         });
+      }
+
+      /*
+       * Function to retrieve the positions for the active account
+       */
+
+   }, {
+      key: "positions",
+      value: function positions() {
+         var _this4 = this;
+
+         // Set up the request as a GET request to the address /positions
+         var req = new Request();
+         req.method = "GET";
+         req.url = urlRoot + "/positions";
+
+         // Set up the request headers, i.e. the api key, the account security session token, the client security token, 
+         // the request content type (JSON), and the expected response content type (JSON)   
+         req.headers = {
+            "X-IG-API-KEY": apiKey,
+            "X-SECURITY-TOKEN": account_token,
+            "CST": client_token,
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8"
+         };
+
+         // No body is required, as this is a GET request
+         req.body = "";
+
+         var positions = [];
+
+         // Send the request via a Javascript AJAX call
+         try {
+            $.ajax({
+               type: req.method,
+               url: req.url,
+               data: req.body,
+               headers: req.headers,
+               async: false,
+               mimeType: req.binary ? 'text/plain; charset=x-user-defined' : null,
+               error: function error(response, status, _error3) {
+                  // An unexpected error occurred
+                  console.log(response);
+               },
+               success: function success(response, status, data) {
+
+                  // Log and display the retrieved positions, along with the Lightstreamer subscription FIDs for the BID and OFFER
+                  // price of each position's market
+                  var epicsItems = [];
+                  $(response.positions).each(function (index) {
+                     var positionData = response.positions[index];
+                     var epic = positionData.market.epic;
+                     var canSubscribe = positionData.market.streamingPricesAvailable;
+
+                     positions.push(new Position(epic, positionData));
+
+                     if (canSubscribe) {
+                        var epicsItem = "L1:" + positionData.market.epic;
+                        epicsItems.push(epicsItem);
+                        console.log("adding subscription index / item: " + index + " / " + epicsItem);
+                     }
+                  });
+
+                  // Now subscribe to the BID and OFFER prices for each position market
+                  if (epicsItems.length > 0) {
+
+                     // Set up Lightstreamer FIDs
+                     var subscription = new Subscription("MERGE", epicsItems, ["BID", "OFFER", "MARKET_STATE"]);
+
+                     subscription.setRequestedSnapshot("yes");
+
+                     // Set up Lightstreamer event listener
+                     subscription.addListener({
+                        onSubscription: function onSubscription() {
+                           console.log('subscribed');
+                        },
+                        onSubscriptionError: function onSubscriptionError(code, message) {
+                           console.log('subscription failure: ' + code + " message: " + message);
+                        },
+                        onItemUpdate: function onItemUpdate(updateInfo) {
+
+                           // Lightstreamer published some data
+                           // The item name in this case will be the market EPIC for which prices were subscribed to
+                           var epic = updateInfo.getItemName().split(":")[1];
+                           updateInfo.forEachField(function (fieldName, fieldPos, value) {
+                              var fieldId = epic.replace(/\./g, "_") + "_" + fieldName;
+                              //let cell = $("." + fieldId);
+
+                              if (fieldName == "MARKET_STATE") {
+                                 //update status image
+                                 if (value == "TRADEABLE") {
+                                    //cell.attr("src", "assets/img/open.png")
+                                 } else if (value == "EDIT") {
+                                    //cell.attr("src", "assets/img/edit.png")
+                                 } else {
+                                       //cell.attr("src", "assets/img/close.png")
+                                    }
+                              } else {
+                                 if (fieldName && cell) {
+                                    //cell.empty();
+                                    //cell.append($('<div>').addClass("tickCell").toggle("highlight").append(value));
+                                 }
+                              }
+                           });
+                        }
+                     });
+
+                     // Subscribe to Lightstreamer
+                     _this4.lsClient.subscribe(subscription);
+                  }
+               }
+            });
+         } catch (e) {
+            console.log(e);
+         }
+      }
+   }]);
+
+   return IG;
+}();
+
+/*
+ * Request class
+ */
+
+
+exports.default = IG;
+
+var Request = function Request(o) {
+   _classCallCheck(this, Request);
+
+   this.headers = { "Content-Type": "application/json; charset=UTF-8", "Accept": "application/json; charset=UTF-8" };
+   this.body = "";
+   this.method = "";
+   this.url = "";
+};
+
+var Position = function Position(epic, positionData) {
+   _classCallCheck(this, Position);
+
+   this.epic = epic;
+   this.positionData = positionData;
+};
+
+},{}],400:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35142,7 +35580,7 @@ exports.default = function () {
 	}
 };
 
-},{"./constants":397,"lodash.assign":61}],400:[function(require,module,exports){
+},{"./constants":397,"lodash.assign":61}],401:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

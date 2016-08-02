@@ -2,23 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Form, {Text, SubmitButton} from './app';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-const styles = {
-	headline: {
-		fontSize: 32,
-		fontWeight: 400,
-		fontFamily: 'Roboto, sans-serif'
-	}
-};
+import IG from '../src/lib/ig';
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+
+		this.formSubmit = (e) => this._formSubmit(e);
+
+		this.IG = new IG();
+	}
+	_formSubmit(e) {
+		if(this.IG.login(e.apiKey, e.username, e.password)) {
+			console.log("Logged in!");
+			this.IG.connectToLightstreamer();
+			this.IG.subscribeToLightstreamerTradeUpdates();
+
+		}
 	}
 	render() {
 		return (
 			<MuiThemeProvider>
 				<div className="col-sm-8 col-sm-offset-2">
-			        <h1 style={styles.headline}>IG Login</h1>
-					<Form onSubmit={data => console.log(data)}>
+			        <h1>IG Login</h1>
+					<Form onSubmit={this.formSubmit}>
 						<div className="row">
 							<div className="col-xs-12 col-sm-6">
 								<Text
@@ -32,19 +39,20 @@ class App extends React.Component {
 						<div className="row">
 							<div className="col-xs-12 col-sm-6">
 								<Text
-									name="email"
-									placeholder="Type your email"
-									label="Email"
-									validate={['required', 'email']}
+									name="username"
+									placeholder="Type your username"
+									label="Username"
+									validate={['required']}
 								/>
 							</div>
 							<div className="col-xs-12 col-sm-6">
 								<Text
+									reference="password"
 									name="password"
+									type="password"
 									placeholder="Type your Password"
 									label="Password"
 									validate={['required']}
-									type="password"
 								/>
 							</div>
 						</div>
